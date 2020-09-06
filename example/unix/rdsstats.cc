@@ -214,13 +214,7 @@ int main(int argc, const char** argv) {
 #endif  // defined(RDS_DEV)
   }
 
-  // const int frequency = 95300000;
   const int frequency = 98500000;
-  // const int frequency = 88500000;
-  // const int frequency = 92300000;
-  // const int frequency = 104900000;
-  // const int frequency = 105700000;
-  // const int frequency = 106500000;
   if (!si470x_set_frequency(g_tuner, frequency)) {
     fprintf(stderr, "Unable to tune to frequency %d.\n", frequency);
     return 1;

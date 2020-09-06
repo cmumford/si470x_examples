@@ -18,7 +18,6 @@ struct app_data {
   struct mgos_ssd1306* display;
   double last_draw_time;
   uint32_t update_num;
-  uint32_t first_bad_update;
 };
 
 const int kFixedFont = 0;
@@ -101,9 +100,6 @@ static void UpdateDisplayCb(void* arg) {
     goto UPDATE_DONE;
   }
 
-  if (app->update_num > 10 && !app->first_bad_update && state.rssi == 0)
-    app->first_bad_update = app->update_num;
-
   char ps[ARRAY_SIZE(rds->ps.display) + 1];
   memcpy(ps, (char*)rds->ps.display, sizeof(rds->ps.display));
   MakeSpaces(ps, ARRAY_SIZE(ps) - 1);
@@ -177,9 +173,8 @@ UPDATE_DONE:
 
   // Draw the update counter.
   {
-    const int kWidth = 115;
-    snprintf(buff, kBuffSize, "draw: %lu, bad: %lu", app->update_num,
-             app->first_bad_update);
+    const int kWidth = 85;
+    snprintf(buff, kBuffSize, "draw: %lu", app->update_num);
     buff[kBuffSize - 1] = '\0';
     mgos_ssd1306_draw_string(app->display, width - kWidth, height - line_height,
                              buff);
