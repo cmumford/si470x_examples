@@ -1,0 +1,45 @@
+author: Chris Mumford
+description: Si470X examples.
+version: 0.7
+
+libs_version: ${mos.version}
+modules_version: ${mos.version}
+mongoose_os_version: ${mos.version}
+
+tags:
+  - c
+  - si470x
+
+sources:
+  - util/rds_util.c
+  - example/mgos
+
+filesystem:
+  - fs
+
+config_schema:
+  - ["debug.level", 2]
+  - ["i2c.enable", true]
+  - ["i2c.scl_gpio", 5]
+  - ["i2c.sda_gpio", 4]
+  - ["si470x.rst_gpio", 2]
+  - ["si470x.advanced_ps", false]
+  - ["si470x.gpio2_int_gpio", 14]
+  - ["ssd1306.i2c.enable", false]  # Use system bus.
+  - ["ssd1306.enable", true]
+  - ["ssd1306.width", 128]
+  - ["ssd1306.height", 64]
+  - ["app.rds_activity_gpio", "i", 16, {title:"Pin to toggle when RDS activity occurs."}]
+
+libs:
+  - origin: https://github.com/mongoose-os-libs/boards
+  - origin: https://github.com/mongoose-os-libs/ca-bundle
+  - origin: https://github.com/mongoose-os-libs/i2c
+  - origin: https://github.com/mongoose-os-libs/rpc-service-config
+  - origin: https://github.com/mongoose-os-libs/rpc-service-fs
+  - origin: https://github.com/mongoose-os-libs/rpc-uart
+  - origin: https://github.com/mongoose-os-libs/ssd1306
+  - origin: https://github.com/cmumford/rds
+  - origin: https://github.com/cmumford/si470x
+
+manifest_version: 2017-09-29
