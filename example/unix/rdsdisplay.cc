@@ -693,21 +693,21 @@ int main(int argc, const char** argv) {
         case 'a':
           g_draw_mode = g_draw_mode != DrawMode::AltFreq ? DrawMode::AltFreq
                                                          : DrawMode::Basic;
-          Draw();
+          g_dirty = true;
           break;
         case 'b':
           g_draw_mode = DrawMode::Basic;
-          Draw();
+          g_dirty = true;
           break;
         case 's':
           g_draw_mode = g_draw_mode != DrawMode::Stats ? DrawMode::Stats
                                                        : DrawMode::Basic;
-          Draw();
+          g_dirty = true;
           break;
         case 'e':
           g_draw_mode =
               g_draw_mode != DrawMode::EON ? DrawMode::EON : DrawMode::Basic;
-          Draw();
+          g_dirty = true;
           break;
         case 'u':
           auto_tune = false;
@@ -722,7 +722,7 @@ int main(int argc, const char** argv) {
             if ((ret = power_on_tuner()))
               return ret;
           }
-          Draw();
+          g_dirty = true;
           break;
         case 'd':
           auto_tune = false;
@@ -736,7 +736,7 @@ int main(int argc, const char** argv) {
             if ((ret = power_on_tuner()))
               return ret;
           }
-          Draw();
+          g_dirty = true;
           break;
         case 'q':
         case 'Q':
