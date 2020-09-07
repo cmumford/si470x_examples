@@ -6,7 +6,9 @@
 
 #include <array>
 #include <atomic>
+#include <chrono>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <oda_decode.h>
@@ -28,6 +30,15 @@ struct RDSTestData {
   std::string fname;                      // File name.
   std::vector<struct rds_blocks> blocks;  // RDS block data in file.
 };
+
+// Sleep for N msecs in main loop.
+constexpr auto kSleepDuration = std::chrono::milliseconds(5);
+
+// Update display every N secs.
+constexpr auto kUpdateInterval = std::chrono::seconds(1);
+
+// Seek tuner up to next station every N secs.
+constexpr auto kTuneInterval = std::chrono::seconds(5);
 
 struct si470x* g_tuner;
 struct rds_oda_data* g_oda_data;
@@ -642,31 +653,40 @@ int main(int argc, const char** argv) {
   g_window = initscr();
   WindowEnder ender;
 
-  mvprintw(30, 0, "Press q to quit.");
   refresh();
 
   int ch;
   nodelay(stdscr, TRUE);
   bool done = false;
-  uint32_t loop_count = 0;            // Number of times through key/radio loop.
-  const uint32_t update_seconds = 1;  // Update minumum once / second.
-  const uint32_t update_msecs = update_seconds * 1000;  // Update every X ms.
-  const uint32_t sleep_msecs = 5;  // Sleep for X msec every update.
-  const uint32_t update_interval = update_msecs / sleep_msecs;
+
+  auto now = std::chrono::system_clock::now().time_since_epoch();
+  auto next_update_time = now + kUpdateInterval;
+  auto next_tune_time = now + kTuneInterval;
+  bool auto_tune = g_rds_test_data.empty();
+
   while (!done) {
+    now = std::chrono::system_clock::now().time_since_epoch();
     if ((ch = getch()) == ERR) {
       // No key.
+      bool do_sleep = true;
       if (g_dirty) {
-        loop_count = 0;
         Draw();
-      } else {
-        usleep(1000 * sleep_msecs);
-        if (loop_count++ >= update_interval) {
-          // Gone too long w/o RDS trigger, poll and update.
-          loop_count = 0;
-          Draw();
-        }
+        next_update_time = now + kUpdateInterval;
+        do_sleep = false;
+      } else if (now >= next_update_time) {
+        // Gone too long w/o RDS trigger, poll and update.
+        Draw();
+        next_update_time = now + kUpdateInterval;
+        do_sleep = false;
       }
+      if (auto_tune && now >= next_tune_time) {
+        bool reached_sfbl;
+        si470x_seek_up(g_tuner, /*allow_wrap=*/true, &reached_sfbl);
+        next_tune_time = now + kTuneInterval;
+        do_sleep = false;
+      }
+      if (do_sleep)
+        std::this_thread::sleep_for(kSleepDuration);
     } else {
       bool reached_sfbl;
       switch (ch) {
@@ -690,6 +710,7 @@ int main(int argc, const char** argv) {
           Draw();
           break;
         case 'u':
+          auto_tune = false;
           if (g_rds_test_data.empty()) {
             si470x_seek_up(g_tuner, /*allow_wrap=*/true, &reached_sfbl);
           } else {
@@ -704,6 +725,7 @@ int main(int argc, const char** argv) {
           Draw();
           break;
         case 'd':
+          auto_tune = false;
           if (g_rds_test_data.empty()) {
             si470x_seek_down(g_tuner, /*allow_wrap=*/true, &reached_sfbl);
           } else {
