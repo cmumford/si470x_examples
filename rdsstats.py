@@ -5,7 +5,6 @@ from __future__ import print_function
 import csv
 import glob
 import subprocess
-import sys
 
 spy_logs_root = '../rds-spy-logs'
 stats_app = 'build/rdsstats'
