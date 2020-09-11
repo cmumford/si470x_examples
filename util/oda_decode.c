@@ -78,15 +78,16 @@ static void decode_rt_plus(struct rds_oda_data* oda,
   uint16_t start = (blocks->c.val & C_START_MARKER_1) >> 7;
   uint16_t length = (blocks->c.val & C_LENGTH_MARKER_1) >> 1;
 
+  const struct rds_rt* rt = rds->rt.decode_rt == RT_A ? &rds->rt.a : &rds->rt.b;
+
   if (content_type1 > 0 && content_type1 <= 63) {  // Valid content type.
-    if ((length == 0 && rds->rt.display[start] == ' ')) {
+    if ((length == 0 && rt->display[start] == ' ')) {
       memset(oda->rtplus.text[content_type1], 0,
              sizeof(oda->rtplus.text[content_type1]));
     } else {
       memset(oda->rtplus.text[content_type1], 0,
              sizeof(oda->rtplus.text[content_type1]));
-      memcpy(oda->rtplus.text[content_type1], &rds->rt.display[start],
-             length + 1);
+      memcpy(oda->rtplus.text[content_type1], &rt->display[start], length + 1);
     }
   }
 
@@ -97,14 +98,13 @@ static void decode_rt_plus(struct rds_oda_data* oda,
 
   if (content_type2 > 0 && content_type2 <= 63) {  // Valid content type.
     if ((content_type1 != content_type2) && length == 0 &&
-        rds->rt.display[start] == ' ') {
+        rt->display[start] == ' ') {
       memset(oda->rtplus.text[content_type2], 0,
              sizeof(oda->rtplus.text[content_type2]));
     } else {
       memset(oda->rtplus.text[content_type2], 0,
              sizeof(oda->rtplus.text[content_type2]));
-      memcpy(oda->rtplus.text[content_type2], &rds->rt.display[start],
-             length + 1);
+      memcpy(oda->rtplus.text[content_type2], &rt->display[start], length + 1);
     }
   }
 }

@@ -139,11 +139,17 @@ void DrawCurrentState() {
   MakeSpaces(ps, ARRAY_SIZE(ps) - 1);
   ps[ARRAY_SIZE(ps) - 1] = '\0';
 
-  char rt[ARRAY_SIZE(rds_data.rt.display) + 1];
-  memcpy(rt, (char*)rds_data.rt.display, sizeof(rt));
-  MakeSpaces(rt, ARRAY_SIZE(rt) - 1);
-  rt[ARRAY_SIZE(rt) - 1] = '\0';
-  TrimTrailingWhitespace(rt);
+  char rta[ARRAY_SIZE(rds_data.rt.a.display) + 1];
+  memcpy(rta, (char*)rds_data.rt.a.display, sizeof(rta));
+  MakeSpaces(rta, ARRAY_SIZE(rta) - 1);
+  rta[ARRAY_SIZE(rta) - 1] = '\0';
+  TrimTrailingWhitespace(rta);
+
+  char rtb[ARRAY_SIZE(rds_data.rt.b.display) + 1];
+  memcpy(rtb, (char*)rds_data.rt.b.display, sizeof(rtb));
+  MakeSpaces(rtb, ARRAY_SIZE(rtb) - 1);
+  rtb[ARRAY_SIZE(rtb) - 1] = '\0';
+  TrimTrailingWhitespace(rtb);
 
   char ptyn[ARRAY_SIZE(rds_data.ptyn.display) + 1];
   memcpy(ptyn, (char*)rds_data.ptyn.display, sizeof(ptyn));
@@ -206,7 +212,10 @@ void DrawCurrentState() {
   if (rds_data.valid_values & RDS_PS)
     mvprintw(y++, 0, "PS:   [%s]", ps);
   if (rds_data.valid_values & RDS_RT) {
-    mvprintw(y++, 0, "RT:   \"%s\"", rt);
+    mvprintw(y++, 0, "RTA%c: \"%s\"", rds_data.rt.decode_rt == RT_A ? '*' : ' ',
+             rta);
+    mvprintw(y++, 0, "RTB%c: \"%s\"", rds_data.rt.decode_rt == RT_B ? '*' : ' ',
+             rtb);
     for (int code_id = 1; code_id <= 63; code_id++) {
       char text[ARRAY_SIZE(g_oda_data->rtplus.text[code_id]) + 1];
       memcpy(text, (char*)g_oda_data->rtplus.text[code_id], sizeof(text));
@@ -570,7 +579,7 @@ int main(int argc, const char** argv) {
     g_tuner = si470x_create(&config, &port_config);
   } else {
     const struct port port_config {
-      .delay = port_noop_delay, .enable_gpio = port_noop_enable_gpio,
+      .delay = port_delay, .enable_gpio = port_noop_enable_gpio,
       .set_pin_mode = port_noop_set_pin_mode,
       .digital_write = port_noop_digital_write,
       .set_interrupt_handler = port_noop_set_interrupt_handler,

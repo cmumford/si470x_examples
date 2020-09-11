@@ -105,8 +105,10 @@ static void UpdateDisplayCb(void* arg) {
   MakeSpaces(ps, ARRAY_SIZE(ps) - 1);
   ps[ARRAY_SIZE(ps) - 1] = '\0';
 
-  char rt[ARRAY_SIZE(rds->rt.display) + 1];
-  memcpy(rt, (char*)rds->rt.display, sizeof(rds->rt.display));
+  const struct rds_rt* rtext =
+      rds->rt.decode_rt == RT_A ? &rds->rt.a : &rds->rt.b;
+  char rt[ARRAY_SIZE(rtext->display) + 1];
+  memcpy(rt, (char*)rtext->display, sizeof(rtext->display));
   MakeSpaces(rt, ARRAY_SIZE(rt) - 1);
   rt[ARRAY_SIZE(rt) - 1] = '\0';
   TrimTrailingWhitespace(rt);
@@ -205,8 +207,10 @@ static void LogStateCb(void* arg) {
   MakeSpaces(ps, ARRAY_SIZE(ps) - 1);
   ps[ARRAY_SIZE(ps) - 1] = '\0';
 
-  char rt[ARRAY_SIZE(rds->rt.display) + 1];
-  memcpy(rt, (char*)rds->rt.display, sizeof(rds->rt.display));
+  const struct rds_rt* rtext =
+      rds->rt.decode_rt == RT_A ? &rds->rt.a : &rds->rt.b;
+  char rt[ARRAY_SIZE(rtext->display) + 1];
+  memcpy(rt, (char*)rtext->display, sizeof(rtext->display));
   MakeSpaces(rt, ARRAY_SIZE(rt) - 1);
   rt[ARRAY_SIZE(rt) - 1] = '\0';
   TrimTrailingWhitespace(rt);
@@ -409,7 +413,8 @@ enum mgos_app_init_result mgos_app_init(void) {
     mgos_set_timer(2000 /* ms */, MGOS_TIMER_REPEAT, LogStateCb, app);
   }
   app->continuous_seek = true;
-  mgos_set_timer(10000 /* ms */, MGOS_TIMER_REPEAT, TuneCb, app);
+  if (false)
+    mgos_set_timer(10000 /* ms */, MGOS_TIMER_REPEAT, TuneCb, app);
 
   AddRPCHandlers(app);
 
