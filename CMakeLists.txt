@@ -61,8 +61,8 @@ target_sources(rds_util
   "util/port_noop.h"
   "util/port_unix.c"
   "util/port_unix.h"
-  "util/rds_spy_log_reader.cc"
-  "util/rds_spy_log_reader.h"
+  "$<BUILD_INTERFACE:${RDS_LIB_DIR}/util>/rds_spy_log_reader.cc"
+  "$<BUILD_INTERFACE:${RDS_LIB_DIR}/util>/rds_spy_log_reader.h"
   "util/rds_util.c"
   "util/rds_util.h"
 )
@@ -86,6 +86,7 @@ add_executable(rdsdisplay
 target_include_directories(rdsdisplay
   PUBLIC
     $<BUILD_INTERFACE:${RDS_LIB_DIR}/include>
+    $<BUILD_INTERFACE:${RDS_LIB_DIR}/util>
     $<BUILD_INTERFACE:${SI470X_LIB_DIR}/include>
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/util>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -98,25 +99,4 @@ target_link_libraries(rdsdisplay Threads::Threads)
 target_compile_options(rdsdisplay PRIVATE -Werror -Wall -Wextra)
 if(HAVE_WIRINGPI)
   target_link_libraries(rdsdisplay wiringPi)
-endif(HAVE_WIRINGPI)
-
-
-add_executable(rdsstats
-  "example/unix/rdsstats.cc"
-)
-target_include_directories(rdsstats
-  PUBLIC
-    $<BUILD_INTERFACE:${RDS_LIB_DIR}/include>
-    $<BUILD_INTERFACE:${SI470X_LIB_DIR}/include>
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/util>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
-target_link_libraries(rdsstats rds_util)
-target_link_libraries(rdsstats si470x)
-target_link_libraries(rdsstats rds)
-target_link_libraries(rdsstats ncurses)
-target_link_libraries(rdsstats Threads::Threads)
-target_compile_options(rdsstats PRIVATE -Werror -Wall -Wextra)
-if(HAVE_WIRINGPI)
-  target_link_libraries(rdsstats wiringPi)
 endif(HAVE_WIRINGPI)

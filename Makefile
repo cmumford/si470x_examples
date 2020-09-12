@@ -4,15 +4,12 @@ CLANG_FORMAT=clang-format
 SOURCE_FILES = \
 	  example/mgos/main.c \
 		example/unix/rdsdisplay.cc \
-		example/unix/rdsstats.cc \
 		util/oda_decode.c \
 		util/oda_decode.h \
 		util/port_noop.c \
 		util/port_noop.h \
 		util/port_unix.c \
 		util/port_unix.h \
-		util/rds_spy_log_reader.cc \
-		util/rds_spy_log_reader.h \
 		util/rds_util.c \
 		util/rds_util.h
 
