@@ -6,8 +6,6 @@ SOURCE_FILES = \
 		example/unix/rdsdisplay.cc \
 		util/oda_decode.c \
 		util/oda_decode.h \
-		util/port_noop.c \
-		util/port_noop.h \
 		util/port_unix.c \
 		util/port_unix.h \
 		util/rds_util.c \

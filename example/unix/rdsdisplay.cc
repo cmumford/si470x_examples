@@ -12,7 +12,6 @@
 #include <vector>
 
 #include <oda_decode.h>
-#include <port_noop.h>
 #include <port_unix.h>
 #include <rds_spy_log_reader.h>
 #include <rds_util.h>
@@ -508,19 +507,6 @@ void Draw() {
 int main(int argc, const char** argv) {
   int ret;
 
-  if (argc == 1 && !port_supports_gpio()) {
-    fprintf(stderr,
-            "This port doesn't support GPIO, "
-            "can only run with test data\n");
-    return 1;
-  }
-  if (argc == 1 && !port_supports_i2c()) {
-    fprintf(stderr,
-            "This port doesn't support I2C, "
-            "can only run with test data\n");
-    return 1;
-  }
-
   if (argc == 2) {
 #if !defined(RDS_DEV)
     fprintf(stdout, "Can't run with test blocks without RDS_DEV defined\n");
@@ -570,6 +556,21 @@ int main(int argc, const char** argv) {
 
   g_oda_data = create_oda_data();
 
+  struct port* port = port_create(!g_rds_test_data.empty());
+
+  if (argc == 1 && !port_supports_gpio(port)) {
+    fprintf(stderr,
+            "This port doesn't support GPIO, "
+            "can only run with test data\n");
+    return 1;
+  }
+  if (argc == 1 && !port_supports_i2c(port)) {
+    fprintf(stderr,
+            "This port doesn't support I2C, "
+            "can only run with test data\n");
+    return 1;
+  }
+
   // These are all wiringPi pin numbers. See http://wiringpi.com/pins/
   const struct si470x_config config = {
       .region = REGION_US,
@@ -578,28 +579,9 @@ int main(int argc, const char** argv) {
       .reset_pin = 6,      // GPIO6
       .sdio_pin = 8,       // GPIO2
       .sclk_pin = 9,       // GPIO3
+      .port = port,
   };
-  if (g_rds_test_data.empty()) {
-    const struct port port_config {
-      .delay = port_delay, .enable_gpio = port_enable_gpio,
-      .set_pin_mode = port_set_pin_mode, .digital_write = port_digital_write,
-      .set_interrupt_handler = port_set_interrupt_handler,
-      .set_i2c_addr = port_set_i2c_addr,
-      .enable_i2c_packet_error_checking = port_enable_i2c_packet_error_checking
-    };
-    g_tuner = si470x_create(&config, &port_config);
-  } else {
-    const struct port port_config {
-      .delay = port_delay, .enable_gpio = port_noop_enable_gpio,
-      .set_pin_mode = port_noop_set_pin_mode,
-      .digital_write = port_noop_digital_write,
-      .set_interrupt_handler = port_noop_set_interrupt_handler,
-      .set_i2c_addr = port_noop_set_i2c_addr,
-      .enable_i2c_packet_error_checking =
-          port_noop_enable_i2c_packet_error_checking
-    };
-    g_tuner = si470x_create(&config, &port_config);
-  }
+  g_tuner = si470x_create(&config);
   TunerDeleter tuner_deleter;
 
   if (!g_tuner) {

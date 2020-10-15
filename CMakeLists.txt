@@ -57,8 +57,6 @@ target_sources(rds_util
   PRIVATE
   "util/oda_decode.c"
   "util/oda_decode.h"
-  "util/port_noop.c"
-  "util/port_noop.h"
   "util/port_unix.c"
   "util/port_unix.h"
   "$<BUILD_INTERFACE:${RDS_LIB_DIR}/util>/rds_spy_log_reader.cc"
