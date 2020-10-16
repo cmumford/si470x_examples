@@ -1,6 +1,7 @@
 #include <mgos.h>
 #include <mgos_rpc.h>
 
+#include <mgos_pwm.h>
 #include <mgos_si470x.h>
 #include <rds_util.h>
 #include <ssd1306.h>
@@ -176,7 +177,7 @@ UPDATE_DONE:
   // Draw the update counter.
   {
     const int kWidth = 85;
-    snprintf(buff, kBuffSize, "draw: %lu", app->update_num);
+    snprintf(buff, kBuffSize, "draw: %u", app->update_num);
     buff[kBuffSize - 1] = '\0';
     mgos_ssd1306_draw_string(app->display, width - kWidth, height - line_height,
                              buff);
@@ -362,9 +363,6 @@ static struct app_data* CreateAppData() {
 }
 
 bool CreateTuner(struct app_data* app) {
-  if (mgos_sys_config_get_app_rds_activity_gpio() >= 0)
-    mgos_gpio_setup_output(mgos_sys_config_get_app_rds_activity_gpio(), false);
-
   app->tuner = mgos_si470x_get_global();
   if (!app->tuner) {
     LOG(LL_ERROR, ("Unable to get the tuner."));
@@ -401,6 +399,12 @@ bool CreateTuner(struct app_data* app) {
 
 enum mgos_app_init_result mgos_app_init(void) {
   struct app_data* app = CreateAppData();
+
+  const int activity_pin = mgos_sys_config_get_app_rds_activity_gpio();
+  if (activity_pin >= 0) {
+    mgos_gpio_setup_output(activity_pin, false);
+    //mgos_pwm_set(activity_pin, /*freq=*/10000, /*duty=*/0.1f);
+  }
 
   if (!CreateTuner(app))
     LOG(LL_ERROR, ("Error creating tuner."));

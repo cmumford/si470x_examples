@@ -12,7 +12,7 @@
 #include <vector>
 
 #include <oda_decode.h>
-#include <port_unix.h>
+#include <port.h>
 #include <rds_spy_log_reader.h>
 #include <rds_util.h>
 #include <si470x.h>
@@ -576,6 +576,7 @@ int main(int argc, const char** argv) {
       .region = REGION_US,
       .advanced_ps_decoding = true,
       .gpio2_int_pin = 5,  // GPIO5
+      .i2c_bus = 1,
       .reset_pin = 6,      // GPIO6
       .sdio_pin = 8,       // GPIO2
       .sclk_pin = 9,       // GPIO3

@@ -25,30 +25,6 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_EXTENSIONS OFF)
 endif(NOT CMAKE_CXX_STANDARD)
 
-include(CheckIncludeFile)
-check_include_file("wiringPi.h" HAVE_WIRING_PI_H)
-check_include_file("linux/i2c-dev.h" HAVE_I2C_DEV_H)
-
-include(CheckLibraryExists)
-check_library_exists(wiringPi wiringPiSetupGpio "" HAVE_WIRINGPI)
-
-include(CheckCXXSymbolExists)
-check_cxx_symbol_exists(usleep "unistd.h" HAVE_USLEEP)
-check_cxx_symbol_exists(nanosleep "time.h" HAVE_NANOSLEEP)
-
-if (HAVE_WIRING_PI_H)
-  add_definitions(-DHAVE_WIRING_PI)
-endif (HAVE_WIRING_PI_H)
-if (HAVE_I2C_DEV_H)
-  add_definitions(-DHAVE_I2C_DEV)
-endif (HAVE_I2C_DEV_H)
-if (HAVE_USLEEP)
-  add_definitions(-DHAVE_USLEEP)
-endif (HAVE_USLEEP)
-if (HAVE_NANOSLEEP)
-  add_definitions(-DHAVE_NANOSLEEP)
-endif (HAVE_NANOSLEEP)
-
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
@@ -57,8 +33,6 @@ target_sources(rds_util
   PRIVATE
   "util/oda_decode.c"
   "util/oda_decode.h"
-  "util/port_unix.c"
-  "util/port_unix.h"
   "$<BUILD_INTERFACE:${RDS_LIB_DIR}/util>/rds_spy_log_reader.cc"
   "$<BUILD_INTERFACE:${RDS_LIB_DIR}/util>/rds_spy_log_reader.h"
   "util/rds_util.c"
