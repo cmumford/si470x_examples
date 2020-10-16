@@ -25,6 +25,16 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_EXTENSIONS OFF)
 endif(NOT CMAKE_CXX_STANDARD)
 
+include(CheckIncludeFile)
+check_include_file("wiringPi.h" HAVE_WIRING_PI_H)
+
+if (HAVE_WIRING_PI_H)
+  add_definitions(-DHAVE_WIRING_PI)
+endif (HAVE_WIRING_PI_H)
+
+include(CheckLibraryExists)
+check_library_exists(wiringPi wiringPiSetupGpio "" HAVE_WIRINGPI)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
