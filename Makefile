@@ -2,12 +2,10 @@
 CLANG_FORMAT=clang-format
 
 SOURCE_FILES = \
-	  example/mgos/main.c \
-		example/unix/rdsdisplay.cc \
-		util/oda_decode.c \
-		util/oda_decode.h \
-		util/rds_util.c \
-		util/rds_util.h
+	  example/mgos/*.c \
+		example/unix/*.cc \
+		example/espidf/*.cc \
+		util/*.[ch]
 
 .PHONY: format
 format:
@@ -19,6 +17,7 @@ docs: doxygen.conf Makefile
 .PHONY: clean
 clean:
 	rm -rf build docs deps memcheck.log
+	platformio -f -c vim run --target clean
 
 build:
 	mkdir build
@@ -39,3 +38,23 @@ tags:
 .PHONY: memcheck
 memcheck: build/rdsdisplay
 	valgrind --log-file=memcheck.log build/rdsdisplay ../rds-spy-logs/Germany
+
+.PHONY: all
+all:
+	platformio -f -c vim run
+
+.PHONY: upload
+upload:
+	platformio -f -c vim run --target upload
+
+.PHONY: program
+program:
+	platformio -f -c vim run --target program
+
+.PHONY: uploadfs
+uploadfs:
+	platformio -f -c vim run --target uploadfs
+
+.PHONY: update
+update:
+	platformio -f -c vim update
