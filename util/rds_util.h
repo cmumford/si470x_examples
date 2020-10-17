@@ -19,7 +19,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <si470x_common.h>
+#include <si470x.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,13 +32,13 @@ extern "C" {
 bool decode_pi_code(char* buffer,
                     size_t buffer_len,
                     uint16_t pi_code,
-                    enum si470x_region region);
+                    enum si470x_region_t region);
 
 const char* get_rdsplus_code_name(uint16_t code_id);
 
-const char* get_pty_code_name(uint8_t pty_code, enum si470x_region region);
+const char* get_pty_code_name(uint8_t pty_code, enum si470x_region_t region);
 
-const char* get_device_name(enum si470x_device device);
+const char* get_device_name(enum si470x_device_t device);
 
 void get_manufacturer_name(uint16_t id, char* name, size_t name_len);
 

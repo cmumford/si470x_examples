@@ -19,7 +19,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <si470x_common.h>
+#include <si470x.h>
 
 #ifdef __cplusplus
 extern "C" {

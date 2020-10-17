@@ -452,7 +452,7 @@ static bool decode_pi_ROW(char* buffer, size_t buffer_len, uint16_t pi_code) {
 bool decode_pi_code(char* buffer,
                     size_t buffer_len,
                     uint16_t pi_code,
-                    enum si470x_region region) {
+                    enum si470x_region_t region) {
   if (region == REGION_US)
     return decode_pi_US(buffer, buffer_len, pi_code);
   else
@@ -526,14 +526,14 @@ static const char* get_pty_code_name_US(uint8_t pty_code) {
   return "[Reserved]";
 }
 
-const char* get_pty_code_name(uint8_t pty_code, enum si470x_region region) {
+const char* get_pty_code_name(uint8_t pty_code, enum si470x_region_t region) {
   if (region == REGION_US)
     return get_pty_code_name_US(pty_code);
   else
     return "? PTY NAME";
 }
 
-const char* get_device_name(enum si470x_device device) {
+const char* get_device_name(enum si470x_device_t device) {
   switch (device) {
     case DEVICE_4700:
       return "Si4700";

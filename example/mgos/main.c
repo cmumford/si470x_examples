@@ -403,7 +403,7 @@ enum mgos_app_init_result mgos_app_init(void) {
   const int activity_pin = mgos_sys_config_get_app_rds_activity_gpio();
   if (activity_pin >= 0) {
     mgos_gpio_setup_output(activity_pin, false);
-    //mgos_pwm_set(activity_pin, /*freq=*/10000, /*duty=*/0.1f);
+    // mgos_pwm_set(activity_pin, /*freq=*/10000, /*duty=*/0.1f);
   }
 
   if (!CreateTuner(app))

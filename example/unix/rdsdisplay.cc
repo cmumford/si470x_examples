@@ -12,10 +12,10 @@
 #include <vector>
 
 #include <oda_decode.h>
-#include <port.h>
 #include <rds_spy_log_reader.h>
 #include <rds_util.h>
 #include <si470x.h>
+#include <si470x_port.h>
 
 namespace {
 
@@ -39,7 +39,7 @@ constexpr auto kUpdateInterval = std::chrono::seconds(1);
 // Seek tuner up to next station every N secs.
 constexpr auto kTuneInterval = std::chrono::seconds(5);
 
-struct si470x* g_tuner;
+struct si470x_t* g_tuner;
 struct rds_oda_data* g_oda_data;
 std::atomic<bool> g_dirty;
 int g_update_num;
@@ -115,7 +115,7 @@ void DecodeODA(uint16_t app_id,
   decode_oda_blocks(oda_data, app_id, rds, blocks, gt);
 }
 
-int DrawHeader(const si470x_state& state, const rds_data& rds_data) {
+int DrawHeader(const si470x_state_t& state, const rds_data& rds_data) {
   if (g_rds_test_data.empty()) {
     char picode[40];
     if (!decode_pi_code(picode, ARRAY_SIZE(picode), rds_data.pi_code,
@@ -137,7 +137,7 @@ int DrawHeader(const si470x_state& state, const rds_data& rds_data) {
 void DrawCurrentState() {
   erase();
 
-  si470x_state state;
+  si470x_state_t state;
   if (!si470x_get_state(g_tuner, &state))
     return;
   rds_data rds_data;
@@ -277,7 +277,7 @@ void DrawCurrentState() {
 void DrawCurrentStats() {
   erase();
 
-  si470x_state state;
+  si470x_state_t state;
   if (!si470x_get_state(g_tuner, &state))
     return;
   rds_data rds_data;
@@ -376,7 +376,7 @@ int DrawAFTable(int y, int x, int table_num, const struct rds_af_table* table) {
 void DrawAlternativeFrequencies() {
   erase();
 
-  si470x_state state;
+  si470x_state_t state;
   if (!si470x_get_state(g_tuner, &state))
     return;
   rds_data rds_data;
@@ -425,7 +425,7 @@ void DrawAlternativeFrequencies() {
 void DrawEON() {
   erase();
 
-  si470x_state state;
+  si470x_state_t state;
   if (!si470x_get_state(g_tuner, &state))
     return;
   rds_data rds_data;
@@ -556,7 +556,7 @@ int main(int argc, const char** argv) {
 
   g_oda_data = create_oda_data();
 
-  struct port* port = port_create(!g_rds_test_data.empty());
+  struct si470x_port_t* port = port_create(!g_rds_test_data.empty());
 
   if (argc == 1 && !port_supports_gpio(port)) {
     fprintf(stderr,
@@ -572,14 +572,18 @@ int main(int argc, const char** argv) {
   }
 
   // These are all wiringPi pin numbers. See http://wiringpi.com/pins/
-  const struct si470x_config config = {
+  const struct si470x_config_t config = {
       .region = REGION_US,
       .advanced_ps_decoding = true,
       .gpio2_int_pin = 5,  // GPIO5
-      .i2c_bus = 1,
       .reset_pin = 6,      // GPIO6
-      .sdio_pin = 8,       // GPIO2
-      .sclk_pin = 9,       // GPIO3
+      .i2c =
+          {
+              .bus = 1,
+              .sdio_pin = 8,  // GPIO2
+              .sclk_pin = 9,  // GPIO3
+              .slave_addr = 0x10,
+          },
       .port = port,
   };
   g_tuner = si470x_create(&config);
