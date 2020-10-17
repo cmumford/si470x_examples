@@ -1,7 +1,6 @@
 #include <mgos.h>
 #include <mgos_rpc.h>
 
-#include <mgos_pwm.h>
 #include <mgos_si470x.h>
 #include <rds_util.h>
 #include <ssd1306.h>
@@ -12,7 +11,7 @@
   } while (0)
 
 struct app_data {
-  struct si470x* tuner;
+  struct si470x_t* tuner;
   struct rds_data* rds_data;
   bool continuous_seek;
   bool dirty;
@@ -88,7 +87,7 @@ static void UpdateDisplayCb(void* arg) {
     goto UPDATE_DONE;
   }
 
-  struct si470x_state state;
+  struct si470x_state_t state;
   if (!mgos_si470x_get_state(app->tuner, &state)) {
     LOG(LL_ERROR, ("Unable to get tuner state."));
     mgos_ssd1306_draw_string(app->display, 0, 0, "Error getting state.");
@@ -192,7 +191,7 @@ static void LogStateCb(void* arg) {
   struct app_data* app = (struct app_data*)arg;
   app->dirty = false;
 
-  struct si470x_state state;
+  struct si470x_state_t state;
   struct rds_data* rds = app->rds_data;
   if (!mgos_si470x_get_state(app->tuner, &state)) {
     LOG(LL_ERROR, ("Unable to get tuner state."));
@@ -247,7 +246,7 @@ static void TuneCb(void* arg) {
   bool reached_sfbl;
   int new_freq =
       mgos_si470x_seek_up(app->tuner, /*allow_wrap=*/false, &reached_sfbl);
-  struct si470x_state state;
+  struct si470x_state_t state;
   mgos_si470x_get_state(app->tuner, &state);
   if (new_freq == -1) {
     LOG(LL_ERROR, ("ERROR seeking"));
@@ -267,7 +266,7 @@ static void GetStateCb(struct mg_rpc_request_info* ri,
 
   struct app_data* app = (struct app_data*)cb_arg;
 
-  struct si470x_state state;
+  struct si470x_state_t state;
   if (mgos_si470x_get_state(app->tuner, &state)) {
     struct rds_data* rds = app->rds_data;
     char ps[ARRAY_SIZE(rds->ps.display) + 1];
@@ -403,7 +402,6 @@ enum mgos_app_init_result mgos_app_init(void) {
   const int activity_pin = mgos_sys_config_get_app_rds_activity_gpio();
   if (activity_pin >= 0) {
     mgos_gpio_setup_output(activity_pin, false);
-    // mgos_pwm_set(activity_pin, /*freq=*/10000, /*duty=*/0.1f);
   }
 
   if (!CreateTuner(app))
