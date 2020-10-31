@@ -573,6 +573,7 @@ int main(int argc, const char** argv) {
 
   // These are all wiringPi pin numbers. See http://wiringpi.com/pins/
   const struct si470x_config_t config = {
+      .port = port,
       .region = REGION_US,
       .advanced_ps_decoding = true,
       .gpio2_int_pin = 5,  // GPIO5
@@ -584,7 +585,6 @@ int main(int argc, const char** argv) {
               .sclk_pin = 9,  // GPIO3
               .slave_addr = 0x10,
           },
-      .port = port,
   };
   g_tuner = si470x_create(&config);
   TunerDeleter tuner_deleter;
