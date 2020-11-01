@@ -21,6 +21,17 @@
 
 #include <si470x.h>
 
+#if !defined(UNUSED)
+#define UNUSED(expr) \
+  do {               \
+    (void)(expr);    \
+  } while (0)
+#endif
+
+#if !defined(ARRAY_SIZE)
+#define ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
